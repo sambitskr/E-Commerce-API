@@ -91,7 +91,7 @@ export const login = async (req, res, next) => {
 
         //separating the password and getting only the rest of the details of the user
         const { password: pass, ...rest } = validUser._doc
-        res.cookie('Token', token, { httpOnly: true }).status(200).json(rest)
+        res.cookie('access_token', token, { httpOnly: true }).status(200).json(rest)
 
     } catch (err) {
         next(err)

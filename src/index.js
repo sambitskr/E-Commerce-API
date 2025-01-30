@@ -2,9 +2,13 @@ import express from 'express'
 import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import authRouter from './routes/auth.route.js'
+import productRouter from './routes/product.route.js'
+import cookieParser from 'cookie-parser'; 
 
-dotenv.config()
 const app = express()
+app.use(cookieParser())
+app.use(express.json())
+dotenv.config()
 
 const port = process.env.PORT
 
@@ -18,9 +22,10 @@ app.listen(port, () => {
     console.log(`Listening at port ${port}...`)
 })
 
-app.use(express.json())
+
 
 app.use("/auth", authRouter)
+app.use("/product", productRouter)
 
 app.use((err, req, res, next) => {
 
