@@ -9,4 +9,5 @@ router.delete('/delete', verifyAdmin,  deleteProduct)
 router.put('/update/:id', verifyAdmin, updateProduct )
 router.get('/get', getProduct)
 
+
 export default router

@@ -13,10 +13,6 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    quantity: {
-        type: Number,
-        default: 1
-    },
     category: {
         type: String,
         enum: ['FOOD', 'ELECTRONICS', 'COSMETICS', 'SANITARIES', 'STATIONARIES'],

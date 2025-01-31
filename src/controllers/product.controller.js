@@ -16,15 +16,10 @@ export const addProduct = async (req, res, next) => {
             return
         }
 
-        if (quantity && !Number.isInteger(quantity)) {
-            res.status(400).json({ message: "Invalid Quantity" })
-            return
-        }
-
+        
         const newProduct = new Product({
             name,
             description,
-            quantity,
             seller,
             price,
             category,
