@@ -65,4 +65,42 @@ export const deleteProduct = async (req, res, next) => {
     }
 }
 
-// export const updateProduct = async
+export const getProduct = async (req, res, next) => {
+    try {
+        const name = req.query.name || ''
+        const category = req.query.category || ''
+
+        if (!name && !category) {
+            res.status(400).json({ Message: "No Search Query received" })
+            return
+        }
+
+        let searchResults
+
+        if (name && !category) {
+            searchResults = await Product.find({
+                name: { $regex: name, $options: 'i' }
+            })
+        }
+        else if (!name && category) {
+            searchResults = await Product.find({ category })
+
+        }
+        else {
+            searchResults = await Product.find({
+                name: { $regex: name, $options: 'i' },
+                category
+            })
+        }
+
+        res.status(200).json(searchResults)
+
+        if(!searchResults.length){
+            res.status(200).json({message: "No products found"})
+        }
+
+    }
+    catch (err) {
+        next(err)
+    }
+}
