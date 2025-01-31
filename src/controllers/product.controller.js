@@ -65,6 +65,28 @@ export const deleteProduct = async (req, res, next) => {
     }
 }
 
+export const updateProduct = async (req, res, next) => {
+    try {
+        const isAdmin = await User.findById(req.user.id)
+        if (isAdmin.role !== 'ADMIN') {
+            res.status(403).json({ Message: "Unaurthorized" })
+            return
+        }
+
+        const updatedProduct = await Product.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true }
+
+        )
+
+        res.status(200).json(updatedProduct)
+
+    } catch (err) {
+        next(err)
+    }
+}
+
 export const getProduct = async (req, res, next) => {
     try {
         const name = req.query.name || ''
@@ -95,8 +117,8 @@ export const getProduct = async (req, res, next) => {
 
         res.status(200).json(searchResults)
 
-        if(!searchResults.length){
-            res.status(200).json({message: "No products found"})
+        if (!searchResults.length) {
+            res.status(200).json({ message: "No products found" })
         }
 
     }
