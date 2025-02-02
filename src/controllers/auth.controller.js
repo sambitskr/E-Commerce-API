@@ -74,7 +74,7 @@ export const login = async (req, res, next) => {
         if (!validUser) {
             res.status(404).json({ message: "User not found" })
             return
-        }
+        } 
 
         //Check for Incorrect credential
         const validPassword = await bcryptjs.compare(password, validUser.password)

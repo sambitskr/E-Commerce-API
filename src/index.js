@@ -24,7 +24,6 @@ app.listen(port, () => {
 })
 
 
-
 app.use("/auth", authRouter)
 app.use("/product", productRouter)
 app.use("/cart", cartRouter)
