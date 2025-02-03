@@ -8,7 +8,7 @@ export const addToCart = async (req, res, next) => {
         //receiving the user id from the request
         const userId = req.params.id
 
-        //Destructing the name and seller of the product from the req
+        //Destructing the name and seller of the product from the request
         const { name, seller, quantity = 1 } = req.body
 
         const productId = await Product.findOne({ name, seller })
@@ -64,6 +64,17 @@ export const getToCart = async (req, res, next) => {
 
         const data = { productData, Totalprice: totalPrice }
         res.status(200).json(data)
+
+    }
+    catch (err) {
+        next(err)
+
+    }
+}
+
+export const DeleteFromCart = async (req, res, next) => {
+    try {
+                      
 
     }
     catch (err) {
