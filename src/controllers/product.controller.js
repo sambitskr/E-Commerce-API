@@ -99,49 +99,82 @@ export const updateProduct = async (req, res, next) => {
 }
 
 // Getting the product 
+// export const getProduct = async (req, res, next) => {
+//     try {
+
+//         //Searching from the product's name and category
+//         const name = req.query.name || ''
+//         const category = req.query.category || ''
+
+//         //If none of them are provided
+//         if (!name && !category) {
+//             res.status(400).json({ Message: "No Search Query received" })
+//             return
+//         }
+
+//         let searchResults
+
+//         //If only name is provided
+//         if (name && !category) {
+//             searchResults = await Product.find({
+//                 name: { $regex: name, $options: 'i' }
+//             })
+//         }
+//         //If only category is provided
+//         else if (!name && category) {
+//             searchResults = await Product.find({ category })
+
+//         }
+//         // If both of them are provided
+//         else {
+//             searchResults = await Product.find({
+//                 name: { $regex: name, $options: 'i' },
+//                 category
+//             })
+//         }
+
+//         res.status(200).json(searchResults)
+
+//         //If no product is found
+//         if (!searchResults.length) {
+//             res.status(200).json({ message: "No products found" })
+//         }
+
+//     }
+//     catch (err) {
+//         next(err)
+//     }
+// }
+
+//Getting the product with pagination
 export const getProduct = async (req, res, next) => {
     try {
-
-        //Searching from the product's name and category
         const name = req.query.name || ''
         const category = req.query.category || ''
+        const page = parseInt(req.query.page) || 1
+        const limit = parseInt(req.query.limit) || 10
 
-        //If none of them are provided
-        if (!name && !category) {
-            res.status(400).json({ Message: "No Search Query received" })
-            return
-        }
+        const query = {};
+        if (name) query.name = { $regex: name, $options: 'i' };
+        if (category) query.category = category
 
-        let searchResults
+        // Fetch products with pagination
+        const products = await Product.find(query)
+            .skip((page - 1) * limit) 
+            .limit(limit); 
 
-        //If only name is provided
-        if (name && !category) {
-            searchResults = await Product.find({
-                name: { $regex: name, $options: 'i' }
-            })
-        }
-        //If only category is provided
-        else if (!name && category) {
-            searchResults = await Product.find({ category })
+        // Get total count of matching products
+        const totalProducts = await Product.countDocuments(query);
 
-        }
-        // If both of them are provided
-        else {
-            searchResults = await Product.find({
-                name: { $regex: name, $options: 'i' },
-                category
-            })
-        }
+        res.status(200).json({
+            totalProducts,
+            totalPages: Math.ceil(totalProducts / limit),
+            currentPage: page,
+            products,
+        });
 
-        res.status(200).json(searchResults)
-
-        //If no product is found
-        if (!searchResults.length) {
-            res.status(200).json({ message: "No products found" })
-        }
-
+    } catch (err) {
+        next(err);
     }
-    catch (err) {
-        next(err)
-    }
-}
+};
+
