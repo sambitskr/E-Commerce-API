@@ -106,6 +106,7 @@ export const getProduct = async (req, res, next) => {
         const name = req.query.name || ''
         const category = req.query.category || ''
 
+        //If none of them are provided
         if (!name && !category) {
             res.status(400).json({ Message: "No Search Query received" })
             return
@@ -113,15 +114,18 @@ export const getProduct = async (req, res, next) => {
 
         let searchResults
 
+        //If only name is provided
         if (name && !category) {
             searchResults = await Product.find({
                 name: { $regex: name, $options: 'i' }
             })
         }
+        //If only category is provided
         else if (!name && category) {
             searchResults = await Product.find({ category })
 
         }
+        // If both of them are provided
         else {
             searchResults = await Product.find({
                 name: { $regex: name, $options: 'i' },
@@ -131,6 +135,7 @@ export const getProduct = async (req, res, next) => {
 
         res.status(200).json(searchResults)
 
+        //If no product is found
         if (!searchResults.length) {
             res.status(200).json({ message: "No products found" })
         }

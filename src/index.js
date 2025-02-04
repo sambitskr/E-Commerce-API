@@ -3,12 +3,15 @@ import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import authRouter from './routes/auth.route.js'
 import productRouter from './routes/product.route.js'
-import cookieParser from 'cookie-parser'; 
+import cookieParser from 'cookie-parser';
 import cartRouter from './routes/cart.route.js'
 
 const app = express()
+
 app.use(cookieParser())
+
 app.use(express.json())
+
 dotenv.config()
 
 const port = process.env.PORT
@@ -28,6 +31,8 @@ app.use("/auth", authRouter)
 app.use("/product", productRouter)
 app.use("/cart", cartRouter)
 
+
+//custom error handling middleware
 app.use((err, req, res, next) => {
 
     const statusCode = err.statusCode || 500

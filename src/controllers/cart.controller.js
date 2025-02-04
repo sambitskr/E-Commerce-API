@@ -5,19 +5,23 @@ import User from '../models/user.models.js'
 //Adding a product to cart
 export const addToCart = async (req, res, next) => {
     try {
+
         //receiving the user id from the request
         const userId = req.params.id
 
         //Destructing the name and seller of the product from the request
         const { name, seller, quantity = 1 } = req.body
 
+        //getting the product id from the name and seller
         const productId = await Product.findOne({ name, seller })
 
+        // Check if there exists a product or not
         if (!productId) {
             res.status(404).json({ message: "Product not found" })
             return
         }
 
+        //If the product is already present in the cart, then increase its quantity otherwise add to cart
         const existingItem = await CartItem.findOne({ userId, productId: productId._id })
 
         if (existingItem) {
@@ -42,9 +46,14 @@ export const addToCart = async (req, res, next) => {
     }
 }
 
+//View cart to check the total price for checkout purposes
 export const getToCart = async (req, res, next) => {
     try {
+
+        //receiving the user id from the request
         const userId = req.params.id
+
+        
         const cartItems = await CartItem.find({ userId })
         if (!cartItems) {
             res.status(404).json({ message: "Cart is empty" })
@@ -54,6 +63,7 @@ export const getToCart = async (req, res, next) => {
         const productData = []
         let totalPrice = 0
 
+        //Calculating the total price of the user according to the products present in the cart and its quantity
         for (let cartItem of cartItems) {
             let product = await Product.findById(cartItem.productId)
             let price = product.price * cartItem.quantity
@@ -72,15 +82,21 @@ export const getToCart = async (req, res, next) => {
     }
 }
 
+//Deleting product from database 
 export const deleteFromCart = async (req, res, next) => {
     try {
+        
+        //destructing the name and seller from the request body
         const { name, seller } = req.body
 
+        //Storing the productId
         const product = await Product.findOne({name, seller})
         const productId = product._id
 
+        //Storing the userId
         const userId = req.params.id
 
+        //getting the cartId from product and userId
         let cartId = await CartItem.find({userId, productId})
         cartId = cartId._id
 
@@ -91,10 +107,7 @@ export const deleteFromCart = async (req, res, next) => {
             return
         }
 
-
         res.status(200).json({Message: "Cart Item Deleted"})
-
-
 
     }
     catch (err) {
