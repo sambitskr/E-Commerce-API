@@ -53,7 +53,7 @@ export const getToCart = async (req, res, next) => {
         //receiving the user id from the request
         const userId = req.params.id
 
-        
+
         const cartItems = await CartItem.find({ userId })
         if (!cartItems) {
             res.status(404).json({ message: "Cart is empty" })
@@ -85,29 +85,29 @@ export const getToCart = async (req, res, next) => {
 //Deleting product from database 
 export const deleteFromCart = async (req, res, next) => {
     try {
-        
+
         //destructing the name and seller from the request body
         const { name, seller } = req.body
 
         //Storing the productId
-        const product = await Product.findOne({name, seller})
+        const product = await Product.findOne({ name, seller })
         const productId = product._id
 
         //Storing the userId
         const userId = req.params.id
 
         //getting the cartId from product and userId
-        let cartId = await CartItem.find({userId, productId})
+        let cartId = await CartItem.find({ userId, productId })
         cartId = cartId._id
 
-        const deleteCart = await CartItem.findOneAndDelete({cartId})
+        const deleteCart = await CartItem.findOneAndDelete({ cartId })
 
         if (!deleteCart) {
             res.status(404).json({ message: "Product not there in cart" })
             return
         }
 
-        res.status(200).json({Message: "Cart Item Deleted"})
+        res.status(200).json({ Message: "Cart Item Deleted" })
 
     }
     catch (err) {
@@ -115,3 +115,48 @@ export const deleteFromCart = async (req, res, next) => {
 
     }
 }
+
+
+export const deleteFromCartByOne = async (req, res, next) => {
+    try {
+        // Destructuring name and seller from request body
+        const { name, seller } = req.body;
+
+        // Find product by name and seller
+        const product = await Product.findOne({ name, seller });
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+        const productId = product._id;
+
+        // Get user ID from request params
+        const userId = req.params.id;
+
+        // Find cart item for this user and product
+        const existingItem = await CartItem.findOne({ userId, productId });
+
+        if (!existingItem) {
+            return res.status(404).json({ message: "Product not present in cart" });
+        }
+
+        // If quantity > 1, reduce quantity; otherwise, remove item
+        if (existingItem.quantity > 1) {
+            const updatedData = await CartItem.findByIdAndUpdate(
+                existingItem._id,
+                { quantity: existingItem.quantity - 1 },
+                { new: true }
+            );
+            return res.status(200).json({
+                message: "Quantity reduced",
+                Updated_Data: updatedData
+            });
+        } else {
+            await CartItem.findByIdAndDelete(existingItem._id);
+            return res.status(200).json({
+                message: "Item removed from cart since only one was present"
+            });
+        }
+    } catch (err) {
+        next(err);
+    }
+};
