@@ -45,7 +45,7 @@ export const addToCart = async (req, res, next) => {
 export const getToCart = async (req, res, next) => {
     try {
         const userId = req.params.id
-        const cartItems = await CartItem.find({userId})
+        const cartItems = await CartItem.find({ userId })
         if (!cartItems) {
             res.status(404).json({ message: "Cart is empty" })
             return
@@ -72,9 +72,29 @@ export const getToCart = async (req, res, next) => {
     }
 }
 
-export const DeleteFromCart = async (req, res, next) => {
+export const deleteFromCart = async (req, res, next) => {
     try {
-                      
+        const { name, seller } = req.body
+
+        const product = await Product.findOne({name, seller})
+        const productId = product._id
+
+        const userId = req.params.id
+
+        let cartId = await CartItem.find({userId, productId})
+        cartId = cartId._id
+
+        const deleteCart = await CartItem.findOneAndDelete({cartId})
+
+        if (!deleteCart) {
+            res.status(404).json({ message: "Product not there in cart" })
+            return
+        }
+
+
+        res.status(200).json({Message: "Cart Item Deleted"})
+
+
 
     }
     catch (err) {
